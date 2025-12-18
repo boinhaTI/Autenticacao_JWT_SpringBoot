@@ -1,0 +1,64 @@
+package io.github.boinhaTI.auth_api.service;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import io.github.boinhaTI.auth_api.dto.AuthDto;
+import io.github.boinhaTI.auth_api.model.Usuario;
+import io.github.boinhaTI.auth_api.repository.UsuariosRepository;
+import io.github.boinhaTI.auth_api.service.contratos.AuthenticationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
+@Service
+public class AuthenticationServiceImpl implements AuthenticationService {
+
+    @Autowired
+    private UsuariosRepository repository;
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return repository.findByLogin(username);
+    }
+    @Override
+    public String obterToken(AuthDto authDto) {
+        Usuario usuario = repository.findByLogin(authDto.login());
+        return gerarTokenJWT(usuario);
+    }
+    public String gerarTokenJWT(Usuario usuario) {
+
+        try {
+            Algorithm algorithm = Algorithm.HMAC256("my-secret");
+            return JWT.create()
+                    .withIssuer("auth-api")
+                    .withSubject(usuario.getLogin())
+                    .withExpiresAt(geraDataExpiracao())
+                    .sign(algorithm);
+        }catch (JWTCreationException e) {
+            throw new RuntimeException("Erro ao gerar token", e);
+        }
+    }
+    public String validarToken(String token) {
+
+        try {
+            Algorithm algorithm = Algorithm.HMAC256("my-secret");
+            return JWT.require(algorithm)
+                    .withIssuer("auth-api")
+                    .build()
+                    .verify(token)
+                    .getSubject();
+        }catch (JWTVerificationException e) {
+            return "";
+        }
+    }
+    private Instant geraDataExpiracao() {
+
+        return LocalDateTime.now().plusHours(8).toInstant(ZoneOffset.of("-03:00"));
+    }
+}

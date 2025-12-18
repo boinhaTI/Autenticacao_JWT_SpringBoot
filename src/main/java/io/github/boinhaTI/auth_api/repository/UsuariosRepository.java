@@ -1,0 +1,9 @@
+package io.github.boinhaTI.auth_api.repository;
+
+import io.github.boinhaTI.auth_api.model.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UsuariosRepository extends JpaRepository<Usuario, Long> {
+
+    Usuario findByLogin(String login);
+}

@@ -1,0 +1,8 @@
+package io.github.boinhaTI.auth_api.dto;
+
+public record UsuarioResponseDto(
+    Long id,
+    String nome,
+    String login
+) {
+}

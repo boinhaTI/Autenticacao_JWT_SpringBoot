@@ -1,0 +1,14 @@
+spring.application.name=auth-api
+
+spring.datasource.url= # coloque o enderec?o do banco
+spring.datasource.username=# coloque o usua?rio
+spring.datasource.password=#coloque a senha
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+
+
+
